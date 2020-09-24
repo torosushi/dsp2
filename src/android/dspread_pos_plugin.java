@@ -34,7 +34,7 @@ import com.dspread.xpos.QPOSService.QPOSServiceListener;
 import com.dspread.xpos.QPOSService.TransactionResult;
 import com.dspread.xpos.QPOSService.TransactionType;
 import com.dspread.xpos.QPOSService.UpdateInformationResult;
-import com.pos.demoui.DUKPK2009_CBC;
+import com.dspread.demoui.utils.DUKPK2009_CBC;
 import com.printer.PrinterInstance;
 import com.printer.bluetooth.BluetoothPort;
 
