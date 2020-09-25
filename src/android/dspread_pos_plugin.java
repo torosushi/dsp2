@@ -774,7 +774,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 		}
 
-		@Override
+		//@Override
 		public void onRequestDevice() {
 
 		}
