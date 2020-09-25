@@ -212,9 +212,9 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 	//initial the pos
 	private void open(CommunicationMode mode) {
-		TRACE.d("open");
+		TRACE.d("open");callbackJs("open(CommunicationMode ","onRequestQposConnected");
 		listener = new MyPosListener();
-		pos = QPOSService.getInstance(mode);callbackJs("open(CommunicationMode "+pos,"onRequestQposConnected");
+		pos = QPOSService.getInstance(mode);callbackJs("open(CommunicationMode "+pos.toString(),"onRequestQposConnected");
 		if (pos == null) {
 			TRACE.d("CommunicationMode unknow");
 			return;
