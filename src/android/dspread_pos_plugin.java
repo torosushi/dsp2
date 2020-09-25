@@ -103,6 +103,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			pos.doTrade(timeout);
 		}else if(action.equals("getDeviceList")){//get all scaned devices
 			TRACE.w("getDeviceList===");
+			
 			posFlag=true;
 			listDevice=pos.getDeviceList();//can get all scaned device
         /*	for (BluetoothDevice dev : listDevice) {
@@ -112,6 +113,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
     			data.add(itm);
 //    			blueToothAddress=dev.getAddress();
         	}*/
+			Toast.makeText(cordova.getActivity(),"getDeviceList "+listDevice.size(),Toast.LENGTH_LONG).show();
 			if(listDevice.size() > 0) {
 				String[] macAddress = new String[listDevice.size()];
 				String devices = "";
