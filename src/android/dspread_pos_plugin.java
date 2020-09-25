@@ -89,7 +89,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			open(CommunicationMode.BLUETOOTH);//initial the open mode
 			boolean a=pos.scanQPos2Mode(activity, 10);
 			Toast.makeText(cordova.getActivity(), "!! scan success "+a, Toast.LENGTH_LONG).show();
-			callbackJs("scanQPos2Mode "+a+" ","onRequestQposConnected");
+			callbackJs("scanQPos2Mode 2"+a+" ","onRequestQposConnected");
 		}else if(action.equals("connectBluetoothDevice")){//connect
 			pos.stopScanQPos2Mode();
 			boolean isAutoConnect=args.getBoolean(0);
