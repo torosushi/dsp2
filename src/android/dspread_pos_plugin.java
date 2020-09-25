@@ -89,7 +89,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			open(CommunicationMode.BLUETOOTH);//initial the open mode
 			boolean a=pos.scanQPos2Mode(activity, 10);
 			Toast.makeText(cordova.getActivity(), "!! scan success "+a, Toast.LENGTH_LONG).show();
-			callbackJs("scanQPos2Mode"+a+" ","onRequestQposConnected");
+			callbackJs("scanQPos2Mode "+a+" ","onRequestQposConnected");
 		}else if(action.equals("connectBluetoothDevice")){//connect
 			pos.stopScanQPos2Mode();
 			boolean isAutoConnect=args.getBoolean(0);
@@ -214,7 +214,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 	private void open(CommunicationMode mode) {
 		TRACE.d("open");
 		listener = new MyPosListener();
-		pos = QPOSService.getInstance(mode);
+		pos = QPOSService.getInstance(mode);callbackJs("open(CommunicationMode "+pos,"onRequestQposConnected");
 		if (pos == null) {
 			TRACE.d("CommunicationMode unknow");
 			return;
@@ -224,7 +224,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		pos.initListener(handler, listener);
 //		sdkVersion = pos.getSdkVersion();
 //		TRACE.i("sdkVersion:"+sdkVersion);
-		mAdapter=BluetoothAdapter.getDefaultAdapter();
+		mAdapter=BluetoothAdapter.getDefaultAdapter();callbackJs("open(CommunicationMode mAdapter "+mAdapter,"onRequestQposConnected");
 //		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
 		//if(pairedDevice!=null){//this used for printer
 		//	printerAddress=pairedDevice.get("deviceAddress");//get the S85 printer address and name
@@ -239,6 +239,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		if (adapter != null && !adapter.isEnabled()) {//表示蓝牙不可用
 			Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			activity.startActivity(enabler);
+			callbackJs("requestPer ","onRequestQposConnected");
 		}
 		lm = (LocationManager) activity.getSystemService(activity.LOCATION_SERVICE);
 		boolean ok = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -248,9 +249,11 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				// 没有权限，申请权限。
 				// 申请授权。
 				cordova.requestPermission(this,100,Manifest.permission.ACCESS_COARSE_LOCATION);
+				callbackJs("requestPer ACCESS_COARSE_LOCATION","onRequestQposConnected");
 			} else {
 				// 有权限了，去放肆吧。
 				Toast.makeText(activity, "Has permission!", Toast.LENGTH_SHORT).show();
+				callbackJs("requestPer Has permission","onRequestQposConnected");
 			}
 		} else {
 			Log.e("BRG", "系统检测到未开启GPS定位服务");
@@ -258,6 +261,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			Intent intent = new Intent();
 			intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 			activity.startActivity(intent);
+			callbackJs("requestPer ACTION_LOCATION_SOURCE_SETTINGS "+intent.toString(),"onRequestQposConnected");
 		}
 		//if (Build.VERSION.SDK_INT >= 23) {
 		//    if(!cordova.hasPermission("android.permission.ACCESS_FINE_LOCATION")){
