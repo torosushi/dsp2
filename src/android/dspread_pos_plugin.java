@@ -89,7 +89,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			open(CommunicationMode.BLUETOOTH);//initial the open mode
 			boolean a=pos.scanQPos2Mode(activity, 10);
 			Toast.makeText(cordova.getActivity(), "!! scan success "+a, Toast.LENGTH_LONG).show();
-			callbackJs(___8drrd3148796d_Xaf()+" scanQPos2Mode 2"+a+" ","onRequestQposConnected");
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" scanQPos2Mode 2"+a+" ","onRequestQposConnected");
 		}else if(action.equals("connectBluetoothDevice")){//connect
 			pos.stopScanQPos2Mode();
 			boolean isAutoConnect=args.getBoolean(0);
@@ -212,9 +212,9 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 	//initial the pos
 	private void open(CommunicationMode mode) {
-		TRACE.d("open");callbackJs(___8drrd3148796d_Xaf()+" open(CommunicationMode ","onRequestQposConnected");
+		TRACE.d("open");callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode ","onRequestQposConnected");
 		listener = new MyPosListener();
-		pos = QPOSService.getInstance(mode);callbackJs(___8drrd3148796d_Xaf()+" open(CommunicationMode "+pos.toString(),"onRequestQposConnected");
+		pos = QPOSService.getInstance(mode);callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode "+pos.toString(),"onRequestQposConnected");
 		if (pos == null) {
 			TRACE.d("CommunicationMode unknow");
 			return;
@@ -224,7 +224,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		pos.initListener(handler, listener);
 //		sdkVersion = pos.getSdkVersion();
 //		TRACE.i("sdkVersion:"+sdkVersion);
-		mAdapter=BluetoothAdapter.getDefaultAdapter();callbackJs(___8drrd3148796d_Xaf()+" open(CommunicationMode mAdapter "+mAdapter,"onRequestQposConnected");
+		mAdapter=BluetoothAdapter.getDefaultAdapter();callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode mAdapter "+mAdapter,"onRequestQposConnected");
 //		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
 		//if(pairedDevice!=null){//this used for printer
 		//	printerAddress=pairedDevice.get("deviceAddress");//get the S85 printer address and name
@@ -239,7 +239,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		if (adapter != null && !adapter.isEnabled()) {//表示蓝牙不可用
 			Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			activity.startActivity(enabler);
-			callbackJs(___8drrd3148796d_Xaf()+" requestPer ","onRequestQposConnected");
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" requestPer ","onRequestQposConnected");
 		}
 		lm = (LocationManager) activity.getSystemService(activity.LOCATION_SERVICE);
 		boolean ok = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -249,11 +249,11 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				// 没有权限，申请权限。
 				// 申请授权。
 				cordova.requestPermission(this,100,Manifest.permission.ACCESS_COARSE_LOCATION);
-				callbackJs(___8drrd3148796d_Xaf()+" requestPer ACCESS_COARSE_LOCATION","onRequestQposConnected");
+				callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" requestPer ACCESS_COARSE_LOCATION","onRequestQposConnected");
 			} else {
 				// 有权限了，去放肆吧。
 				Toast.makeText(activity, "Has permission!", Toast.LENGTH_SHORT).show();
-				callbackJs(___8drrd3148796d_Xaf()+" requestPer Has permission","onRequestQposConnected");
+				callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" requestPer Has permission","onRequestQposConnected");
 			}
 		} else {
 			Log.e("BRG", "系统检测到未开启GPS定位服务");
@@ -261,7 +261,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			Intent intent = new Intent();
 			intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 			activity.startActivity(intent);
-			callbackJs(___8drrd3148796d_Xaf()+" requestPer ACTION_LOCATION_SOURCE_SETTINGS "+intent.toString(),"onRequestQposConnected");
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" requestPer ACTION_LOCATION_SOURCE_SETTINGS "+intent.toString(),"onRequestQposConnected");
 		}
 		//if (Build.VERSION.SDK_INT >= 23) {
 		//    if(!cordova.hasPermission("android.permission.ACCESS_FINE_LOCATION")){
