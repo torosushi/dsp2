@@ -1,25 +1,22 @@
 package org.apache.cordova.posPlugin;
 
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaWebView;
-
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaArgs;
-import org.apache.cordova.CordovaInterface;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.ContextWrapper;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.location.LocationManager;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.provider.Settings;
+import android.util.Log;
+import android.webkit.JavascriptInterface;
+import android.widget.Toast;
 
 import com.dspread.xpos.EmvAppTag;
 import com.dspread.xpos.EmvCapkTag;
@@ -34,27 +31,25 @@ import com.dspread.xpos.QPOSService.QPOSServiceListener;
 import com.dspread.xpos.QPOSService.TransactionResult;
 import com.dspread.xpos.QPOSService.TransactionType;
 import com.dspread.xpos.QPOSService.UpdateInformationResult;
-import com.dspread.demoui.utils.DUKPK2009_CBC;
-import com.printer.PrinterInstance;
-import com.printer.bluetooth.BluetoothPort;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.ContextWrapper;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.provider.ContactsContract.AggregationExceptions;
-import android.support.v4.app.ActivityCompat;
-import android.webkit.JavascriptInterface;
-import android.widget.Toast;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaArgs;
+import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaWebView;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class echoes a string called from JavaScript.
@@ -62,7 +57,7 @@ import android.widget.Toast;
 public class dspread_pos_plugin extends CordovaPlugin {
 	private MyPosListener listener;
 	private QPOSService pos;
-	private BluetoothAdapter mAdapter; 
+	private BluetoothAdapter mAdapter;
 	private String sdkVersion;
 	private String blueToothAddress;
 	private List<BluetoothDevice> listDevice;
@@ -74,48 +69,42 @@ public class dspread_pos_plugin extends CordovaPlugin {
 	private String cashbackAmount = "";
 	private List<Map<String, ?>> data = new ArrayList<Map<String, ?>>();
 	private static final int PROGRESS_UP = 1001;
-	private PrinterInstance mPrinter;
 	private String printerAddress;
 	private String printerName;
 	private Hashtable<String, String> pairedDevice;
 	private Activity activity;
-    private CordovaWebView webView;
-    private boolean posFlag=false;
+	private CordovaWebView webView;
+	private LocationManager lm;//【位置管理】
+	private boolean posFlag=false;
 
-    @Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-    	
-        return super.execute(action, args, callbackContext);
-    }
-    
-    @Override
-    public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-    	if(action.equals("scanQPos2Mode")) {
-        	boolean a=pos.scanQPos2Mode(activity, 10);
-        	Toast.makeText(cordova.getActivity(), "scan success", Toast.LENGTH_LONG).show();
-        }else if(action.equals("keyExchange")){
-    		String data = args.getString(0);
-    		String key = args.getString(1);
-			byte[] result = DUKPK2009_CBC.TriDesDecryptionECB(QPOSUtil.HexStringToByteArray(key),QPOSUtil.HexStringToByteArray(data));
-			String keyResult = QPOSUtil.byteArray2Hex(result);
-			TRACE.i("ddd = " + keyResult);
-//			callbackJs(keyResult,"getKeyResult");
+	@Override
+	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+
+		return super.execute(action, args, callbackContext);
+	}
+
+	@Override
+	public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
+		if(action.equals("scanQPos2Mode")) {
+			open(CommunicationMode.BLUETOOTH);//initial the open mode
+			boolean a=pos.scanQPos2Mode(activity, 10);
+			Toast.makeText(cordova.getActivity(), "scan success "+a, Toast.LENGTH_LONG).show();
 		}else if(action.equals("connectBluetoothDevice")){//connect
-        	boolean isAutoConnect=args.getBoolean(0);
-        	String address=args.getString(1);
-        	int i=address.indexOf("(");
-        	int e=address.indexOf(")");
-        	String mac=address.substring(i+1,e);
-        	TRACE.d("address==="+mac);
-        	pos.connectBluetoothDevice(isAutoConnect, 20, mac);
-        }else if(action.equals("doTrade")){//start to do a trade
-        	int timeout=args.getInt(0);
-        	pos.doTrade(timeout);
-        }else if(action.equals("getDeviceList")){//get all scaned devices
-        	TRACE.w("getDeviceList===");
-        	posFlag=true;
-        	listDevice=pos.getDeviceList();//can get all scaned device
-        	TRACE.w("getDeviceList size==="+listDevice.size());
+			pos.stopScanQPos2Mode();
+			boolean isAutoConnect=args.getBoolean(0);
+			String address=args.getString(1);
+			//int i=address.indexOf("(");
+			//int e=address.indexOf(")");
+			//String mac=address.substring(i+1,e);
+			TRACE.d("address==="+address);
+			pos.connectBluetoothDevice(isAutoConnect, 20, address);
+		}else if(action.equals("doTrade")){//start to do a trade
+			int timeout=args.getInt(0);
+			pos.doTrade(timeout);
+		}else if(action.equals("getDeviceList")){//get all scaned devices
+			TRACE.w("getDeviceList===");
+			posFlag=true;
+			listDevice=pos.getDeviceList();//can get all scaned device
         /*	for (BluetoothDevice dev : listDevice) {
         		Map<String, Object> itm = new HashMap<String, Object>();
         		itm.put("TITLE", dev.getName() + "(" + dev.getAddress() + ")");
@@ -123,82 +112,75 @@ public class dspread_pos_plugin extends CordovaPlugin {
     			data.add(itm);
 //    			blueToothAddress=dev.getAddress();
         	}*/
-        	String[] macAddress=new String[listDevice.size()];
-        	String devices="";
-        	for(int i=0;i<listDevice.size();i++){
-        		macAddress[i]=listDevice.get(i).getName()+"("+listDevice.get(i).getAddress()+"),";
-        		if(i==list.size()-1){
-        			macAddress[i]=listDevice.get(i).getName()+"("+listDevice.get(i).getAddress()+")";
-        		}
-        		devices+=macAddress[i];
-        	}
-        	TRACE.w("get devi=="+devices);
-        	callback(devices);
-        }else if(action.equals("stopScanQPos2Mode")){//stop scan bluetooth
-        	pos.stopScanQPos2Mode();
-        }else if(action.equals("disconnectBT")){//discooect bluetooth
-        	pos.disconnectBT();
-        }else if(action.equals("getQposInfo")){//get the pos info
-        	pos.getQposInfo();
-        }else if(action.equals("getQposId")){//get the pos id
-        	pos.getQposId(20);
-        }else if(action.equals("updateIPEK")){//update the ipek key
-        	String ipekGroup=args.getString(0);
-        	String trackksn=args.getString(1);
-        	String trackipek=args.getString(2);
-        	String trackipekCheckvalue=args.getString(3);
-        	String emvksn=args.getString(4);
-        	String emvipek=args.getString(5);
-        	String emvipekCheckvalue=args.getString(6);
-        	String pinksn=args.getString(7);
-        	String pinipek=args.getString(8);
-        	String pinipekCheckvalue=args.getString(9);
+			if(listDevice.size() > 0) {
+				String[] macAddress = new String[listDevice.size()];
+				String devices = "";
+				for (int i = 0; i < listDevice.size(); i++) {
+					macAddress[i] = listDevice.get(i).getName() + "(" + listDevice.get(i).getAddress() + "),";
+					//if (i == list.size() - 1) {
+					//	macAddress[i] = listDevice.get(i).getName() + "(" + listDevice.get(i).getAddress() + ")";
+					//}
+					devices += macAddress[i];
+				}
+				TRACE.w("get devi==" + devices);
+				callback(devices);
+			}
+		}else if(action.equals("stopScanQPos2Mode")){//stop scan bluetooth
+			pos.stopScanQPos2Mode();
+		}else if(action.equals("disconnectBT")){//discooect bluetooth
+			pos.disconnectBT();
+		}else if(action.equals("getQposInfo")){//get the pos info
+			pos.getQposInfo();
+		}else if(action.equals("getQposId")){//get the pos id
+			pos.getQposId(20);
+		}else if(action.equals("updateIPEK")){//update the ipek key
+			String ipekGroup=args.getString(0);
+			String trackksn=args.getString(1);
+			String trackipek=args.getString(2);
+			String trackipekCheckvalue=args.getString(3);
+			String emvksn=args.getString(4);
+			String emvipek=args.getString(5);
+			String emvipekCheckvalue=args.getString(6);
+			String pinksn=args.getString(7);
+			String pinipek=args.getString(8);
+			String pinipekCheckvalue=args.getString(9);
 //        	pos.doUpdateIPEKOperation("00", "09117081600001E00001", "413DF85BD9D9A7C34EDDB2D2B5CA0C0F", "6A52E41A7F91C9F5", "09117081600001E00001", "413DF85BD9D9A7C34EDDB2D2B5CA0C0F", "6A52E41A7F91C9F5", "09117081600001E00001", "413DF85BD9D9A7C34EDDB2D2B5CA0C0F", "6A52E41A7F91C9F5");
-        	pos.doUpdateIPEKOperation(ipekGroup, trackksn, trackipek, trackipekCheckvalue, emvksn, emvipek, emvipekCheckvalue, pinksn, pinipek, pinipekCheckvalue);
-        }else if(action.equals("updateEmvApp")){//update the emv app config
-        	list.add(EmvAppTag.Terminal_Default_Transaction_Qualifiers+"36C04000");
+			pos.doUpdateIPEKOperation(ipekGroup, trackksn, trackipek, trackipekCheckvalue, emvksn, emvipek, emvipekCheckvalue, pinksn, pinipek, pinipekCheckvalue);
+		}else if(action.equals("updateEmvApp")){//update the emv app config
+			list.add(EmvAppTag.Terminal_Default_Transaction_Qualifiers+"36C04000");
 			list.add(EmvAppTag.Contactless_CVM_Required_limit+"000000060000");
 			list.add(EmvAppTag.terminal_contactless_transaction_limit+"000000060000");
-        	pos.updateEmvAPP(EMVDataOperation.update,list);
-        }else if(action.equals("updateEmvCAPK")){//update the emv capk config
-        	list.add(EmvCapkTag.RID+"A000000004");
+			pos.updateEmvAPP(EMVDataOperation.update,list);
+		}else if(action.equals("updateEmvCAPK")){//update the emv capk config
+			list.add(EmvCapkTag.RID+"A000000004");
 			list.add(EmvCapkTag.Public_Key_Index+"F1");
 			list.add(EmvCapkTag.Public_Key_Module+"A0DCF4BDE19C3546B4B6F0414D174DDE294AABBB828C5A834D73AAE27C99B0B053A90278007239B6459FF0BBCD7B4B9C6C50AC02CE91368DA1BD21AAEADBC65347337D89B68F5C99A09D05BE02DD1F8C5BA20E2F13FB2A27C41D3F85CAD5CF6668E75851EC66EDBF98851FD4E42C44C1D59F5984703B27D5B9F21B8FA0D93279FBBF69E090642909C9EA27F898959541AA6757F5F624104F6E1D3A9532F2A6E51515AEAD1B43B3D7835088A2FAFA7BE7");
 			list.add(EmvCapkTag.Public_Key_CheckValue+"D8E68DA167AB5A85D8C3D55ECB9B0517A1A5B4BB");
 			list.add(EmvCapkTag.Pk_exponent+"03");
-        	pos.updateEmvCAPK(EMVDataOperation.update, list);
-        }else if(action.equals("setMasterKey")){//set the masterkey
-        	String key=args.getString(0);
-        	String checkValue=args.getString(1);
-        	pos.setMasterKey(key,checkValue);
-        }else if(action.equals("updatePosFirmware")){//update pos firmware
-        	byte[] data=readLine("upgrader.asc");//upgrader.asc place in the assets folder
-        	pos.updatePosFirmware(data, blueToothAddress);//deviceAddress is BluetoothDevice address
-        	UpdateThread updateThread = new UpdateThread();
+			pos.updateEmvCAPK(EMVDataOperation.update, list);
+		}else if(action.equals("setMasterKey")){//set the masterkey
+			String key=args.getString(0);
+			String checkValue=args.getString(1);
+			pos.setMasterKey(key,checkValue);
+		}else if(action.equals("updatePosFirmware")){//update pos firmware
+			byte[] data=readLine("upgrader.asc");//upgrader.asc place in the assets folder
+			pos.updatePosFirmware(data, blueToothAddress);//deviceAddress is BluetoothDevice address
+			UpdateThread updateThread = new UpdateThread();
 			updateThread.start();
-        }else if(action.equals("connectBTPrinter")){//connect the printer
-        	mPrinter = new BluetoothPort().btConnnect(cordova.getActivity(), printerAddress, mAdapter, updata_handler);
-        }else if(action.equals("disconnectBTPrinter")){//disconnect the printer
-        	mPrinter.closeConnection();
-        }else if(action.equals("printText")){
-        	String content=args.getString(0);
-        	mPrinter.init();//init the printer
-			mPrinter.printText(content);//print the text
-			mPrinter.setPrinter(1, 2);//PRINT_AND_WAKE_PAPER_BY_LINE
-        }
-        return true;
-    }
-    
-    @JavascriptInterface
-    public void callback(String mac) {
-    	TRACE.d("callback js =="+mac);
-    	if(posFlag){
-    		callJS("addDevices('"+mac+"')");
-    	}else{
-    		callJS("posresult('"+mac+"')");
-    	}
-    	posFlag=false;
-    }
+		}
+		return true;
+	}
+
+	@JavascriptInterface
+	public void callback(String mac) {
+		TRACE.d("callback js =="+mac);
+		if(posFlag){
+			callJS("addDevices('"+mac+"')");
+		}else{
+			callJS("posresult('"+mac+"')");
+		}
+		posFlag=false;
+	}
 
 	@JavascriptInterface
 	public void callbackJs(String mac,String id) {
@@ -206,28 +188,27 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		callJS(id+"('"+mac+"')");
 	}
 
-    //call js file
-    private void callJS(final String js) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                webView.loadUrl("javascript:" + js);
-            }
-        });
-    }
-    
-    @Override
-    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-    	// TODO Auto-generated method stub
-    	super.initialize(cordova, webView);
-    	this.activity=cordova.getActivity();
-    	this.webView=webView;
-    	open(CommunicationMode.BLUETOOTH);//initial the open mode
-//    	requestPer();
-    }
-    
-    //initial the pos
-    private void open(CommunicationMode mode) {
+	//call js file
+	private void callJS(final String js) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				webView.loadUrl("javascript:" + js);
+			}
+		});
+	}
+
+	@Override
+	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+		// TODO Auto-generated method stub
+		super.initialize(cordova, webView);
+		this.activity=cordova.getActivity();
+		this.webView=webView;
+		requestPer();
+	}
+
+	//initial the pos
+	private void open(CommunicationMode mode) {
 		TRACE.d("open");
 		listener = new MyPosListener();
 		pos = QPOSService.getInstance(mode);
@@ -240,51 +221,93 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		pos.initListener(handler, listener);
 //		sdkVersion = pos.getSdkVersion();
 //		TRACE.i("sdkVersion:"+sdkVersion);
-		mAdapter=BluetoothAdapter.getDefaultAdapter();;
-		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
-//		if(pairedDevice!=null){
-//			printerAddress=pairedDevice.get("deviceAddress");//get the S85 printer address and name
-//			printerName=pairedDevice.get("deviceName");
-//		}else{
-//			Toast.makeText(activity, "please first to paired the printer", Toast.LENGTH_LONG).show();
-//		}
+		mAdapter=BluetoothAdapter.getDefaultAdapter();
+//		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
+		//if(pairedDevice!=null){//this used for printer
+		//	printerAddress=pairedDevice.get("deviceAddress");//get the S85 printer address and name
+		//	printerName=pairedDevice.get("deviceName");
+		//}else{
+		//	Toast.makeText(activity, "please first to paired the printer", Toast.LENGTH_LONG).show();
+		//}
 	}
-    
-  /*  private void requestPer(){
-    		if (Build.VERSION.SDK_INT >= 23) {
-    	        if(!cordova.hasPermission("android.permission.ACCESS_FINE_LOCATION")){
-    	        	cordova.requestPermission(this, 100, "android.permission.ACCESS_FINE_LOCATION");
-    	        	cordova.requestPermission(this, 101, "android.permission.ACCESS_COARSE_LOCATION");
-    	        	TRACE.d( "retuest the permission");
-    	        }else{
-    	        	TRACE.d( "has the permission");
-    	        }
-    	    }
-    }*/
-    
-    private void sendMsg(int what) {
+
+	private void requestPer(){
+		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+		if (adapter != null && !adapter.isEnabled()) {//表示蓝牙不可用
+			Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			activity.startActivity(enabler);
+		}
+		lm = (LocationManager) activity.getSystemService(activity.LOCATION_SERVICE);
+		boolean ok = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		if (ok) {//开了定位服务
+			if (!cordova.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+				Log.e("POS_SDK", "没有权限");
+				// 没有权限，申请权限。
+				// 申请授权。
+				cordova.requestPermission(this,100,Manifest.permission.ACCESS_COARSE_LOCATION);
+			} else {
+				// 有权限了，去放肆吧。
+				Toast.makeText(activity, "Has permission!", Toast.LENGTH_SHORT).show();
+			}
+		} else {
+			Log.e("BRG", "系统检测到未开启GPS定位服务");
+			Toast.makeText(activity, "系统检测到未开启GPS定位服务", Toast.LENGTH_SHORT).show();
+			Intent intent = new Intent();
+			intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+			activity.startActivity(intent);
+		}
+		//if (Build.VERSION.SDK_INT >= 23) {
+		//    if(!cordova.hasPermission("android.permission.ACCESS_FINE_LOCATION")){
+		//    	cordova.requestPermission(this, 100, "android.permission.ACCESS_FINE_LOCATION");
+		//    	cordova.requestPermission(this, 101, "android.permission.ACCESS_COARSE_LOCATION");
+		//    	TRACE.d( "retuest the permission");
+		//    }else{
+		//    	TRACE.d( "has the permission");
+		//    }
+		//}
+	}
+
+	@Override
+	public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+		super.onRequestPermissionResult(requestCode, permissions, grantResults);
+		switch (requestCode) {
+			case 100: {
+				if (grantResults.length > 0
+						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					// 权限被用户同意。
+					Toast.makeText(activity, "Has open the permission!", Toast.LENGTH_LONG).show();
+				} else {
+					// 权限被用户拒绝了。
+					Toast.makeText(activity, "Permission has been limited", Toast.LENGTH_LONG).show();
+				}
+
+			}
+			break;
+		}
+	}
+
+	private void sendMsg(int what) {
 		Message msg = new Message();
 		msg.what = what;
 		mHandler.sendMessage(msg);
 	}
-    
-    private Handler mHandler=new Handler(){
-    	public void handleMessage(Message msg) {
-    		switch (msg.what) {
-			case 8003:
-				Hashtable<String, String> h =  pos.getNFCBatchData();
-				TRACE.w("nfc batchdata: "+h);
-				String content = "\nNFCbatchData: "+h.get("tlv");
-				break;
 
-			default:
-				break;
+	private Handler mHandler=new Handler(){
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+				case 8003:
+					Hashtable<String, String> h =  pos.getNFCBatchData();
+					TRACE.w("nfc batchdata: "+h);
+					String content = "\nNFCbatchData: "+h.get("tlv");
+					break;
+				default:
+					break;
 			}
-    	};
-    };
-    
-    //read the buffer
-    private byte[] readLine(String Filename) {
+		}
+	};
+
+	//read the buffer
+	private byte[] readLine(String Filename) {
 
 		String str = "";
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream(0);
@@ -306,10 +329,10 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		}
 		return buffer.toByteArray();
 	}
-    
-    class UpdateThread extends Thread {
+
+	class UpdateThread extends Thread {
 		public void run() {
-			
+
 			while (true) {
 				try {
 					Thread.sleep(10);
@@ -332,90 +355,90 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				break;
 			}
 		};
-	};
-	
+	}
+
 	private Handler updata_handler = new Handler() {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case PROGRESS_UP://update the firmware
-				TRACE.i(msg.obj.toString() + "%");
-				break;
-			case 101://the callback of the connect the printer success
-				Toast.makeText(cordova.getActivity(), "connect the printer success", Toast.LENGTH_LONG).show();
-				break;
-			default:
-				break;
+				case PROGRESS_UP://update the firmware
+					TRACE.i(msg.obj.toString() + "%");
+					break;
+				case 101://the callback of the connect the printer success
+					Toast.makeText(cordova.getActivity(), "connect the printer success", Toast.LENGTH_LONG).show();
+					break;
+				default:
+					break;
 			}
-		};
+		}
 	};
-   
+
 	//our sdk api callback(success or fail)
-    class MyPosListener implements QPOSServiceListener{
+	class MyPosListener implements QPOSServiceListener{
 
 		@Override
 		public void getMifareCardVersion(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void getMifareFastReadData(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void getMifareReadData(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onAddKey(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onBluetoothBoardStateResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onBluetoothBondFailed() {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onBluetoothBondTimeout() {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onBluetoothBonded() {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onBluetoothBonding() {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onCbcMacResult(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onConfirmAmountResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -425,8 +448,12 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				String name=arg0.getName();
 				String mac = name+" "+address;
 				TRACE.i("scaned the device:\n"+name+"("+address+")");
-				callbackJs(mac,"addrow");
+				if (!"".equals(name) && name != null){
+					callbackJs(mac,"addrow");
+				}
+
 			}
+
 		}
 
 		@Override
@@ -644,13 +671,13 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		@Override
 		public void onEmvICCExceptionData(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onEncryptData(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -690,85 +717,145 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		@Override
 		public void onFinishMifareCardResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onGetCardNoResult(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onGetInputAmountResult(boolean arg0, String arg1) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onGetPosComm(int arg0, String arg1, String arg2) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onGetShutDownTime(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onGetSleepModeTime(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onLcdShowCustomDisplay(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onOperateMifareCardResult(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onPinKey_TDES_Result(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onQposDoGetTradeLog(String arg0, String arg1) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onRequestDevice() {
+
+		}
+
+		@Override
+		public void onGetKeyCheckValue(List<String> list) {
+
+		}
+
+		@Override
+		public void onGetDevicePubKey(String s) {
+
+		}
+
+		@Override
+		public void onSetPosBlePinCode(boolean b) {
+
+		}
+
+		@Override
+		public void onTradeCancelled() {
+
+		}
+
+		@Override
+		public void onReturnSetAESResult(boolean b, String s) {
+
+		}
+
+		@Override
+		public void onReturnAESTransmissonKeyResult(boolean b, String s) {
+
+		}
+
+		@Override
+		public void onReturnSignature(boolean b, String s) {
+
+		}
+
+		@Override
+		public void onReturnConverEncryptedBlockFormat(String s) {
+
+		}
+
+		@Override
+		public void onQposIsCardExistInOnlineProcess(boolean b) {
+
+		}
+
+		@Override
+		public void onReturnSetConnectedShutDownTimeResult(boolean b) {
+
+		}
+
+		@Override
+		public void onReturnGetConnectedShutDownTimeResult(String s) {
+
 		}
 
 		@Override
 		public void onQposDoGetTradeLogNum(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onQposDoSetRsaPublicKey(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onQposDoTradeLog(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onQposGenerateSessionKeysResult(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -780,7 +867,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 						.get("csn");
 				String psamId=arg0.get("psamId") == null ? "" : arg0
 						.get("psamId");
-				
+
 				String content = "";
 				content += "posId" + posId + "\n";
 				content += "csn: " + csn + "\n";
@@ -811,9 +898,9 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			content += "isUsbConnected" + isUsbConnected + "\n";
 			content += "isCharging" + isCharging + "\n";
 //			if (batteryPercentage==null || "".equals(batteryPercentage)) {
-				content += "batteryLevel" + batteryLevel + "\n";
+			content += "batteryLevel" + batteryLevel + "\n";
 //			}else {
-				content += "batteryPercentage"  + batteryPercentage + "\n";
+			content += "batteryPercentage"  + batteryPercentage + "\n";
 //			}
 			content += "hardwareVersion" + hardwareVersion + "\n";
 			content += "SUB : " + SUB + "\n";
@@ -824,27 +911,32 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		}
 
 		@Override
+		public void onQposCertificateInfoResult(List<String> list) {
+
+		}
+
+		@Override
 		public void onQposIsCardExist(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onQposKsnResult(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReadBusinessCardResult(boolean arg0, String arg1) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReadMifareCardResult(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -859,12 +951,13 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		@Override
 		public void onRequestCalculateMac(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onRequestDeviceScanFinished() {
 			TRACE.i("scan finished");
+			Toast.makeText(activity,"scan finished",Toast.LENGTH_LONG).show();
 		}
 
 		@Override
@@ -902,7 +995,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		@Override
 		public void onRequestFinalConfirm() {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -918,21 +1011,25 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		}
 
 		@Override
+		public void onRequestNoQposDetectedUnbond() {
+
+		}
+
+		@Override
 		public void onRequestOnlineProcess(String arg0) {
 			TRACE.d("onRequestOnlineProcess");
 			TRACE.i("return transaction online data:"+arg0);
 			Hashtable<String, String> decodeData = pos.anlysEmvIccData(arg0);
 			TRACE.i("decodeData:" + decodeData);
 			//go online
-			String str = "5A0A6214672500000000056F5F24032307315F25031307085F2A0201565F34010182027C008407A00000033301018E0C000000000000000002031F009505088004E0009A031406179C01009F02060000000000019F03060000000000009F0702AB009F080200209F0902008C9F0D05D86004A8009F0E0500109800009F0F05D86804F8009F101307010103A02000010A010000000000CE0BCE899F1A0201569F1E0838333230314943439F21031826509F2608881E2E4151E527899F2701809F3303E0F8C89F34030203009F3501229F3602008E9F37042120A7189F4104000000015A0A6214672500000000056F5F24032307315F25031307085F2A0201565F34010182027C008407A00000033301018E0C000000000000000002031F00";
-			pos.sendOnlineProcessResult("8A023030"+str);
+			pos.sendOnlineProcessResult("8A023030");
 		}
 
 		@Override
 		public void onRequestQposConnected() {
 			TRACE.w("onRequestQposConnected");
 //			Toast.makeText(cordova.getActivity(), "onRequestQposConnected", Toast.LENGTH_LONG).show();
-			callback("onRequestQposConnected");
+			callbackJs("onRequestQposConnected","onRequestQposConnected");
 		}
 
 		@Override
@@ -976,7 +1073,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		@Override
 		public void onRequestSignatureResult(byte[] arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -989,7 +1086,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		@Override
 		public void onRequestTransactionLog(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -1037,13 +1134,38 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 		@Override
 		public void onRequestUpdateKey(String arg0) {
-			
+
 		}
 
 		@Override
 		public void onRequestUpdateWorkKeyResult(UpdateInformationResult arg0) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onRequestSendTR31KeyResult(boolean b) {
+
+		}
+
+		@Override
+		public void onQposRequestPinResult(List<String> list, int i) {
+
+		}
+
+		@Override
+		public void onReturnD20SleepTimeResult(boolean b) {
+
+		}
+
+		@Override
+		public void onQposRequestPinStartResult(List<String> list) {
+
+		}
+
+		@Override
+		public void onQposPinMapSyncResult(boolean b, boolean b1) {
+
 		}
 
 		@Override
@@ -1053,153 +1175,233 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		}
 
 		@Override
+		public void onReturnRsaResult(String s) {
+
+		}
+
+		@Override
+		public void onQposInitModeResult(boolean b) {
+
+		}
+
+		@Override
+		public void onD20StatusResult(String s) {
+
+		}
+
+		@Override
+		public void onQposTestSelfCommandResult(boolean b, String s) {
+
+		}
+
+		@Override
+		public void onQposTestCommandResult(boolean b, String s) {
+
+		}
+
+		@Override
 		public void onReturnApduResult(boolean arg0, String arg1, int arg2) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnBatchSendAPDUResult(LinkedHashMap<Integer, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnCustomConfigResult(boolean arg0, String arg1) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onRetuenGetTR31Token(String s) {
+
 		}
 
 		@Override
 		public void onReturnDownloadRsaPublicKey(HashMap<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnGetEMVListResult(String arg0) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onReturnGetCustomEMVListResult(Map<String, String> map) {
+
 		}
 
 		@Override
 		public void onReturnGetPinResult(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnGetQuickEmvResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnNFCApduResult(boolean arg0, String arg1, int arg2) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnPowerOffIccResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnPowerOffNFCResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnPowerOnIccResult(boolean arg0, String arg1, String arg2, int arg3) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnPowerOnNFCResult(boolean arg0, String arg1, String arg2, int arg3) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnReversalData(String arg0) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onReturnGetPinInputResult(int i) {
+
+		}
+
+		@Override
+		public void onReturnGetKeyBoardInputResult(String s) {
+
 		}
 
 		@Override
 		public void onReturnSetMasterKeyResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnSetSleepTimeResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnUpdateEMVRIDResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnUpdateEMVResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onReturnUpdateIPEKResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onReturnRSAResult(String s) {
+
 		}
 
 		@Override
 		public void onReturniccCashBack(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onSearchMifareCardResult(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onBatchReadMifareCardResult(String s, Hashtable<String, List<String>> hashtable) {
+
+		}
+
+		@Override
+		public void onBatchWriteMifareCardResult(String s, Hashtable<String, List<String>> hashtable) {
+
 		}
 
 		@Override
 		public void onSetBuzzerResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onSetBuzzerTimeResult(boolean b) {
+
+		}
+
+		@Override
+		public void onSetBuzzerStatusResult(boolean b) {
+
+		}
+
+		@Override
+		public void onGetBuzzerStatusResult(String s) {
+
 		}
 
 		@Override
 		public void onSetManagementKey(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onSetParamsResult(boolean arg0, Hashtable<String, Object> arg1) {
 			// TODO Auto-generated method stub
-			
+
+		}
+
+		@Override
+		public void onSetVendorIDResult(boolean b, Hashtable<String, Object> hashtable) {
+
 		}
 
 		@Override
 		public void onSetSleepModeTime(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onUpdateMasterKeyResult(boolean arg0, Hashtable<String, String> arg1) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -1218,44 +1420,44 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		@Override
 		public void onVerifyMifareCardResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onWaitingforData(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onWriteBusinessCardResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onWriteMifareCardResult(boolean arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void transferMifareData(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void verifyMifareULData(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void writeMifareULData(String arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
-    	
-    }
+
+	}
 }
