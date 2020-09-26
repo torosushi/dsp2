@@ -239,6 +239,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				callback(devices);
 			}				
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+pairedDevices.size(),"onRequestQposConnected");
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices "+devices,"onRequestQposConnected");
 		}
 //		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
 		//if(pairedDevice!=null){//this used for printer
