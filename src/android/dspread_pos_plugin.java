@@ -776,73 +776,73 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 		}
 
-		@Override
+		//@Override
 		public void onRequestDevice() {
 
 		}
 
-		@Override
+		//@Override
 		public void onGetKeyCheckValue(List<String> list) {
 
 		}
 
-		@Override
+		//@Override
 		public void onGetDevicePubKey(String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onSetPosBlePinCode(boolean b) {
 
 		}
 
-		@Override
+		//@Override
 		public void onTradeCancelled() {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnSetAESResult(boolean b, String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnAESTransmissonKeyResult(boolean b, String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnSignature(boolean b, String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnConverEncryptedBlockFormat(String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onQposIsCardExistInOnlineProcess(boolean b) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnSetConnectedShutDownTimeResult(boolean b) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnGetConnectedShutDownTimeResult(String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onQposDoGetTradeLogNum(String arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onQposDoSetRsaPublicKey(boolean arg0) {
 			// TODO Auto-generated method stub
 
@@ -912,12 +912,12 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			callback(content);
 		}
 
-		@Override
+		//@Override
 		public void onQposCertificateInfoResult(List<String> list) {
 
 		}
 
-		@Override
+		//@Override
 		public void onQposIsCardExist(boolean arg0) {
 			// TODO Auto-generated method stub
 
@@ -1012,7 +1012,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			Toast.makeText(cordova.getActivity(), "onRequestNoQposDetected", Toast.LENGTH_LONG).show();
 		}
 
-		@Override
+		//@Override
 		public void onRequestNoQposDetectedUnbond() {
 
 		}
@@ -1145,27 +1145,27 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 		}
 
-		@Override
+		//@Override
 		public void onRequestSendTR31KeyResult(boolean b) {
 
 		}
 
-		@Override
+		//@Override
 		public void onQposRequestPinResult(List<String> list, int i) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnD20SleepTimeResult(boolean b) {
 
 		}
 
-		@Override
+		//@Override
 		public void onQposRequestPinStartResult(List<String> list) {
 
 		}
 
-		@Override
+		//@Override
 		public void onQposPinMapSyncResult(boolean b, boolean b1) {
 
 		}
@@ -1176,220 +1176,220 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			callback("please insert/swipe/tap card");
 		}
 
-		@Override
+		//@Override
 		public void onReturnRsaResult(String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onQposInitModeResult(boolean b) {
 
 		}
 
-		@Override
+		//@Override
 		public void onD20StatusResult(String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onQposTestSelfCommandResult(boolean b, String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onQposTestCommandResult(boolean b, String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnApduResult(boolean arg0, String arg1, int arg2) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnBatchSendAPDUResult(LinkedHashMap<Integer, String> arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnCustomConfigResult(boolean arg0, String arg1) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onRetuenGetTR31Token(String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnDownloadRsaPublicKey(HashMap<String, String> arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnGetEMVListResult(String arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnGetCustomEMVListResult(Map<String, String> map) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnGetPinResult(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnGetQuickEmvResult(boolean arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnNFCApduResult(boolean arg0, String arg1, int arg2) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnPowerOffIccResult(boolean arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnPowerOffNFCResult(boolean arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnPowerOnIccResult(boolean arg0, String arg1, String arg2, int arg3) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnPowerOnNFCResult(boolean arg0, String arg1, String arg2, int arg3) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnReversalData(String arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnGetPinInputResult(int i) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnGetKeyBoardInputResult(String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnSetMasterKeyResult(boolean arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnSetSleepTimeResult(boolean arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnUpdateEMVRIDResult(boolean arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnUpdateEMVResult(boolean arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnUpdateIPEKResult(boolean arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onReturnRSAResult(String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onReturniccCashBack(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onSearchMifareCardResult(Hashtable<String, String> arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onBatchReadMifareCardResult(String s, Hashtable<String, List<String>> hashtable) {
 
 		}
 
-		@Override
+		//@Override
 		public void onBatchWriteMifareCardResult(String s, Hashtable<String, List<String>> hashtable) {
 
 		}
 
-		@Override
+		//@Override
 		public void onSetBuzzerResult(boolean arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onSetBuzzerTimeResult(boolean b) {
 
 		}
 
-		@Override
+		//@Override
 		public void onSetBuzzerStatusResult(boolean b) {
 
 		}
 
-		@Override
+		//@Override
 		public void onGetBuzzerStatusResult(String s) {
 
 		}
 
-		@Override
+		//@Override
 		public void onSetManagementKey(boolean arg0) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onSetParamsResult(boolean arg0, Hashtable<String, Object> arg1) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		//@Override
 		public void onSetVendorIDResult(boolean b, Hashtable<String, Object> hashtable) {
 
 		}
