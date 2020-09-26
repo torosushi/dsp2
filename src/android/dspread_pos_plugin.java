@@ -310,7 +310,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				String[] macAddress = new String[pairedDevices.size()];
 				int i = 0;
 				for(BluetoothDevice device: pairedDevices){
-					macAddress[i]=pairedDevices.getName() + "(" + pairedDevices.getAddress() + "),";
+					macAddress[i]=device.getName() + "(" + device.getAddress() + "),";
 					devices += macAddress[i];
 				i++;}
 				callback(devices);
