@@ -109,18 +109,17 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList ","onRequestQposConnected");
 			posFlag=true;
 			listDevice=pos.getDeviceList();//can get all scaned device
-
 			/*
         	for (BluetoothDevice dev : listDevice) {
         		Map<String, Object> itm = new HashMap<String, Object>();
         		itm.put("TITLE", dev.getName() + "(" + dev.getAddress() + ")");
     			itm.put("ADDRESS", dev.getAddress());
     			data.add(itm);
-//    			blueToothAddress=dev.getAddress();
+   				// blueToothAddress=dev.getAddress();
         	}*/
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList size "+listDevice.size(),"onRequestQposConnected");
 			//Toast.makeText(cordova.getActivity(),"getDeviceList "+listDevice.size(),Toast.LENGTH_LONG).show();
-			if (listDevice.size() < 1) {listDevice = bluetoothAdapter.getBondedDevices();}
+			if(listDevice.size() < 1) {listDevice = bluetoothAdapter.getBondedDevices();}
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+listDevice.size(),"onRequestQposConnected");
 
 			if(listDevice.size() > 0) {
