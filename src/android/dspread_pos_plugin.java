@@ -90,10 +90,11 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			boolean a=pos.scanQPos2Mode(activity, 10);
 			Toast.makeText(cordova.getActivity(), "!! scan success "+a, Toast.LENGTH_LONG).show();
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" scanQPos2Mode 2"+a+" ","onRequestQposConnected");
-		}else if(action.equals("connectBluetoothDevice")){//connect
+		}else if(action.equals("connectBluetoothDevice")){			
 			pos.stopScanQPos2Mode();
 			boolean isAutoConnect=args.getBoolean(0);
 			String address=args.getString(1);
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" connectBluetoothDevice "+address,"onRequestQposConnected");
 			//int i=address.indexOf("(");
 			//int e=address.indexOf(")");
 			//String mac=address.substring(i+1,e);
@@ -104,7 +105,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			pos.doTrade(timeout);
 		}else if(action.equals("getDeviceList")){//get all scaned devices
 			TRACE.w("getDeviceList===");
-			
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList ","onRequestQposConnected");
 			posFlag=true;
 			listDevice=pos.getDeviceList();//can get all scaned device
         /*	for (BluetoothDevice dev : listDevice) {
@@ -212,9 +213,11 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 	//initial the pos
 	private void open(CommunicationMode mode) {
-		TRACE.d("open");callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode ","onRequestQposConnected");
+		TRACE.d("open");
+		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode ","onRequestQposConnected");
 		listener = new MyPosListener();
-		pos = QPOSService.getInstance(mode);callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode "+pos.toString(),"onRequestQposConnected");
+		pos = QPOSService.getInstance(mode);
+		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode "+pos.toString(),"onRequestQposConnected");
 		if (pos == null) {
 			TRACE.d("CommunicationMode unknow");
 			return;
@@ -224,7 +227,8 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		pos.initListener(handler, listener);
 //		sdkVersion = pos.getSdkVersion();
 //		TRACE.i("sdkVersion:"+sdkVersion);
-		mAdapter=BluetoothAdapter.getDefaultAdapter();callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode mAdapter "+mAdapter,"onRequestQposConnected");
+		mAdapter=BluetoothAdapter.getDefaultAdapter();
+		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode mAdapter "+mAdapter,"onRequestQposConnected");
 //		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
 		//if(pairedDevice!=null){//this used for printer
 		//	printerAddress=pairedDevice.get("deviceAddress");//get the S85 printer address and name
