@@ -79,16 +79,17 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-
 		return super.execute(action, args, callbackContext);
 	}
 
 	@Override
 	public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-		if(action.equals("scanQPos2Mode")) {
 			open(CommunicationMode.BLUETOOTH);//initial the open mode
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" CommunicationMode","onRequestQposConnected");
+		if(action.equals("scanQPos2Mode")) {
 			boolean a=pos.scanQPos2Mode(activity, 10);
 			Toast.makeText(cordova.getActivity(), "!! scan success "+a, Toast.LENGTH_LONG).show();
+			if(a){callbackContext.success("begin to scan!");}
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" scanQPos2Mode 2"+a+" ","onRequestQposConnected");
 		}else if(action.equals("connectBluetoothDevice")){			
 			pos.stopScanQPos2Mode();
@@ -108,7 +109,9 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList ","onRequestQposConnected");
 			posFlag=true;
 			listDevice=pos.getDeviceList();//can get all scaned device
-        /*	for (BluetoothDevice dev : listDevice) {
+
+			/*
+        	for (BluetoothDevice dev : listDevice) {
         		Map<String, Object> itm = new HashMap<String, Object>();
         		itm.put("TITLE", dev.getName() + "(" + dev.getAddress() + ")");
     			itm.put("ADDRESS", dev.getAddress());
@@ -116,7 +119,10 @@ public class dspread_pos_plugin extends CordovaPlugin {
 //    			blueToothAddress=dev.getAddress();
         	}*/
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList size "+listDevice.size(),"onRequestQposConnected");
-			Toast.makeText(cordova.getActivity(),"getDeviceList "+listDevice.size(),Toast.LENGTH_LONG).show();
+			//Toast.makeText(cordova.getActivity(),"getDeviceList "+listDevice.size(),Toast.LENGTH_LONG).show();
+			if (listDevice.size()<1) {listDevice = bluetoothAdapter.getBondedDevices();}
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+listDevice.size(),"onRequestQposConnected");
+
 			if(listDevice.size() > 0) {
 				String[] macAddress = new String[listDevice.size()];
 				String devices = "";
@@ -129,6 +135,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				}
 				TRACE.w("get devi==" + devices);
 				callback(devices);
+				callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" devices "+devices.toString(),"onRequestQposConnected");
 			}
 		}else if(action.equals("stopScanQPos2Mode")){//stop scan bluetooth
 			pos.stopScanQPos2Mode();
@@ -205,6 +212,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" initialize ","onRequestQposConnected");
 		// TODO Auto-generated method stub
 		super.initialize(cordova, webView);
 		this.activity=cordova.getActivity();
@@ -218,17 +226,17 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		listener = new MyPosListener();
 		pos = QPOSService.getInstance(mode);
 		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode pos "+pos.toString(),"onRequestQposConnected");
-		if (pos == null) {
+		if(pos == null) {
 			TRACE.d("CommunicationMode unknow");
 			return;
 		}
 		pos.setConext(cordova.getActivity());
 		Handler handler = new Handler(Looper.myLooper());
-		pos.initListener(handler, listener);
+		pos.initListener(handler, listener);//audiojack reader?
 		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode listener "+listener,"onRequestQposConnected");
-		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode handler "+handler,"onRequestQposConnected");
-//		sdkVersion = pos.getSdkVersion();
-//		TRACE.i("sdkVersion:"+sdkVersion);
+		
+		sdkVersion = pos.getSdkVersion();
+		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode sdkVersion "+sdkVersion,"onRequestQposConnected");
 		mAdapter=BluetoothAdapter.getDefaultAdapter();
 		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode mAdapter "+mAdapter,"onRequestQposConnected");
 //		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
@@ -269,6 +277,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			activity.startActivity(intent);
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" requestPer ACTION_LOCATION_SOURCE_SETTINGS "+intent.toString(),"onRequestQposConnected");
 		}
+		
 		//if (Build.VERSION.SDK_INT >= 23) {
 		//    if(!cordova.hasPermission("android.permission.ACCESS_FINE_LOCATION")){
 		//    	cordova.requestPermission(this, 100, "android.permission.ACCESS_FINE_LOCATION");
@@ -278,6 +287,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		//    	TRACE.d( "has the permission");
 		//    }
 		//}
+		
 	}
 
 	@Override
