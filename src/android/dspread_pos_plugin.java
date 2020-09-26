@@ -89,8 +89,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			open(CommunicationMode.BLUETOOTH);//initial the open mode
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" CommunicationMode","onRequestQposConnected");
 			boolean a=pos.scanQPos2Mode(activity, 10);
-			Toast.makeText(cordova.getActivity(), "!! scan success "+a, Toast.LENGTH_LONG).show();
-			if(a){callbackContext.success("begin to scan!");}
+			Toast.makeText(cordova.getActivity(), "!! scan success "+a, Toast.LENGTH_LONG).show();			
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" scanQPos2Mode 2"+a+" ","onRequestQposConnected");
 		}else if(action.equals("connectBluetoothDevice")){			
 			pos.stopScanQPos2Mode();
@@ -251,7 +250,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		
 		//sdkVersion = pos.getSdkVersion();
 		//callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode sdkVersion "+sdkVersion,"onRequestQposConnected");
-		//mAdapter=BluetoothAdapter.getDefaultAdapter();
+		mAdapter=BluetoothAdapter.getDefaultAdapter();
 		//callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode mAdapter "+mAdapter,"onRequestQposConnected");
 //		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
 		//if(pairedDevice!=null){//this used for printer
@@ -264,7 +263,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 	private void requestPer(){
 		//BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		mAdapter=BluetoothAdapter.getDefaultAdapter();
+		//mAdapter=BluetoothAdapter.getDefaultAdapter();
 		if (mAdapter != null && !mAdapter.isEnabled()) {//表示蓝牙不可用
 			Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			activity.startActivity(enabler);
