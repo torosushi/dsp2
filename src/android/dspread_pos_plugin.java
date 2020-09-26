@@ -115,6 +115,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
     			data.add(itm);
 //    			blueToothAddress=dev.getAddress();
         	}*/
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList size "+listDevice.size(),"onRequestQposConnected");
 			Toast.makeText(cordova.getActivity(),"getDeviceList "+listDevice.size(),Toast.LENGTH_LONG).show();
 			if(listDevice.size() > 0) {
 				String[] macAddress = new String[listDevice.size()];
@@ -214,10 +215,9 @@ public class dspread_pos_plugin extends CordovaPlugin {
 	//initial the pos
 	private void open(CommunicationMode mode) {
 		TRACE.d("open");
-		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode ","onRequestQposConnected");
 		listener = new MyPosListener();
 		pos = QPOSService.getInstance(mode);
-		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode "+pos.toString(),"onRequestQposConnected");
+		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode pos "+pos.toString(),"onRequestQposConnected");
 		if (pos == null) {
 			TRACE.d("CommunicationMode unknow");
 			return;
@@ -225,6 +225,8 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		pos.setConext(cordova.getActivity());
 		Handler handler = new Handler(Looper.myLooper());
 		pos.initListener(handler, listener);
+		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode listener "+listener,"onRequestQposConnected");
+		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode handler "+handler,"onRequestQposConnected");
 //		sdkVersion = pos.getSdkVersion();
 //		TRACE.i("sdkVersion:"+sdkVersion);
 		mAdapter=BluetoothAdapter.getDefaultAdapter();
@@ -281,12 +283,14 @@ public class dspread_pos_plugin extends CordovaPlugin {
 	@Override
 	public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
 		super.onRequestPermissionResult(requestCode, permissions, grantResults);
+		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" onRequestPermissionResult "+requestCode,"onRequestQposConnected");
 		switch (requestCode) {
 			case 100: {
 				if (grantResults.length > 0
 						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					// 权限被用户同意。
 					Toast.makeText(activity, "Has open the permission!", Toast.LENGTH_LONG).show();
+					callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" requestPer Has open the permission ","onRequestQposConnected");
 				} else {
 					// 权限被用户拒绝了。
 					Toast.makeText(activity, "Permission has been limited", Toast.LENGTH_LONG).show();
