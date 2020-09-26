@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 /**
@@ -302,6 +303,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		//    }
 		//}
 		if(mAdapter.isEnabled()){
+			String devices = "";
 			//deviceItemList=new ArrayList<DeviceItem>(); 
 			Set<BluetoothDevice> pairedDevices=mAdapter.getBondedDevices();
 			if (pairedDevices.size() > 0) {
