@@ -117,13 +117,9 @@ public class dspread_pos_plugin extends CordovaPlugin {
     			data.add(itm);
    				// blueToothAddress=dev.getAddress();
         	}*/
-			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList size "+listDevice.size(),"onRequestQposConnected");
 			//Toast.makeText(cordova.getActivity(),"getDeviceList "+listDevice.size(),Toast.LENGTH_LONG).show();
-			if(listDevice.size()<1){
-				listDevice=mAdapter.getBondedDevices();
-				callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+listDevice.size(),"onRequestQposConnected");
-			}
-			if(listDevice.size() > 0) {
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList size "+listDevice.size(),"onRequestQposConnected");
+			if(listDevice.size()>0){
 				String[] macAddress = new String[listDevice.size()];
 				String devices = "";
 				for (int i = 0; i < listDevice.size(); i++) {
@@ -134,9 +130,26 @@ public class dspread_pos_plugin extends CordovaPlugin {
 					devices += macAddress[i];
 				}
 				TRACE.w("get devi==" + devices);
-				callback(devices);
-				callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" devices "+devices.toString(),"onRequestQposConnected");
+			}else{
+				if(mAdapter.isEnabled()){
+					//deviceItemList=new ArrayList<DeviceItem>(); 
+					Set<BluetoothDevice> pairedDevices=mAdapter.getBondedDevices();
+					if (pairedDevices.size() > 0) {
+						String[] macAddress = new String[pairedDevices.size()];
+						String devices = "";
+						for (int i = 0; i < pairedDevices.size(); i++) {
+							macAddress[i] = pairedDevices.get(i).getName() + "(" + pairedDevices.get(i).getAddress() + "),";
+							devices += macAddress[i];
+						}
+					}				
+					callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+listDevice.size(),"onRequestQposConnected");
+				}
 			}
+			if(listDevice.size()<1) {callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" devices "+devices.toString(),"onRequestQposConnected");return;}
+			
+			callback(devices);
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" devices "+devices.toString(),"onRequestQposConnected");
+			
 		}else if(action.equals("stopScanQPos2Mode")){//stop scan bluetooth
 			pos.stopScanQPos2Mode();
 		}else if(action.equals("disconnectBT")){//discooect bluetooth
