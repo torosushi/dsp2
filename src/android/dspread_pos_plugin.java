@@ -119,9 +119,10 @@ public class dspread_pos_plugin extends CordovaPlugin {
         	}*/
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList size "+listDevice.size(),"onRequestQposConnected");
 			//Toast.makeText(cordova.getActivity(),"getDeviceList "+listDevice.size(),Toast.LENGTH_LONG).show();
-			if(listDevice.size() < 1) {listDevice = bluetoothAdapter.getBondedDevices();}
-			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+listDevice.size(),"onRequestQposConnected");
-
+			if(listDevice.size()<1){
+				Set<BluetoothDevice> listDevice=mAdapter.getBondedDevices();
+				callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+listDevice.size(),"onRequestQposConnected");
+			}
 			if(listDevice.size() > 0) {
 				String[] macAddress = new String[listDevice.size()];
 				String devices = "";
@@ -236,8 +237,8 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		
 		sdkVersion = pos.getSdkVersion();
 		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode sdkVersion "+sdkVersion,"onRequestQposConnected");
-		mAdapter=BluetoothAdapter.getDefaultAdapter();
-		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode mAdapter "+mAdapter,"onRequestQposConnected");
+		//mAdapter=BluetoothAdapter.getDefaultAdapter();
+		//callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode mAdapter "+mAdapter,"onRequestQposConnected");
 //		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
 		//if(pairedDevice!=null){//this used for printer
 		//	printerAddress=pairedDevice.get("deviceAddress");//get the S85 printer address and name
@@ -248,8 +249,9 @@ public class dspread_pos_plugin extends CordovaPlugin {
 	}
 
 	private void requestPer(){
-		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		if (adapter != null && !adapter.isEnabled()) {//表示蓝牙不可用
+		//BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+		mAdapter=BluetoothAdapter.getDefaultAdapter();
+		if (mAdapter != null && !mAdapter.isEnabled()) {//表示蓝牙不可用
 			Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			activity.startActivity(enabler);
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" requestPer ","onRequestQposConnected");
