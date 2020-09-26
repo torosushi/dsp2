@@ -57,7 +57,7 @@ import java.util.Map;
 public class dspread_pos_plugin extends CordovaPlugin {
 	private MyPosListener listener;
 	private QPOSService pos;
-	private BluetoothAdapter mAdapter;
+	private BluetoothAdapter mAdapter=BluetoothAdapter.getDefaultAdapter();
 	private String sdkVersion;
 	private String blueToothAddress;
 	private List<BluetoothDevice> listDevice;
@@ -263,7 +263,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 	private void requestPer(){
 		//BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		mAdapter=BluetoothAdapter.getDefaultAdapter();
+		//mAdapter=BluetoothAdapter.getDefaultAdapter();
 		if (mAdapter != null && !mAdapter.isEnabled()) {//表示蓝牙不可用
 			Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			activity.startActivity(enabler);
