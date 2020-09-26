@@ -119,9 +119,9 @@ public class dspread_pos_plugin extends CordovaPlugin {
         	}*/
 			//Toast.makeText(cordova.getActivity(),"getDeviceList "+listDevice.size(),Toast.LENGTH_LONG).show();
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList size "+listDevice.size(),"onRequestQposConnected");
+			String devices = "";
 			if(listDevice.size()>0){
 				String[] macAddress = new String[listDevice.size()];
-				String devices = "";
 				for (int i = 0; i < listDevice.size(); i++) {
 					macAddress[i] = listDevice.get(i).getName() + "(" + listDevice.get(i).getAddress() + "),";
 					//if (i == list.size() - 1) {
@@ -131,21 +131,21 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				}
 				TRACE.w("get devi==" + devices);
 			}else{
+				/*
 				if(mAdapter.isEnabled()){
 					//deviceItemList=new ArrayList<DeviceItem>(); 
 					Set<BluetoothDevice> pairedDevices=mAdapter.getBondedDevices();
 					if (pairedDevices.size() > 0) {
 						String[] macAddress = new String[pairedDevices.size()];
-						String devices = "";
 						for (int i = 0; i < pairedDevices.size(); i++) {
 							macAddress[i] = pairedDevices.get(i).getName() + "(" + pairedDevices.get(i).getAddress() + "),";
 							devices += macAddress[i];
 						}
 					}				
-					callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+listDevice.size(),"onRequestQposConnected");
-				}
+					callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+pairedDevices.size(),"onRequestQposConnected");
+				}*/
 			}
-			if(listDevice.size()<1) {callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" devices "+devices.toString(),"onRequestQposConnected");return;}
+			if(listDevice.size()<1) {callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" devices "+devices.toString(),"onRequestQposConnected");return false;}
 			
 			callback(devices);
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" devices "+devices.toString(),"onRequestQposConnected");
@@ -301,6 +301,18 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		//    	TRACE.d( "has the permission");
 		//    }
 		//}
+		if(mAdapter.isEnabled()){
+			//deviceItemList=new ArrayList<DeviceItem>(); 
+			Set<BluetoothDevice> pairedDevices=mAdapter.getBondedDevices();
+			if (pairedDevices.size() > 0) {
+				String[] macAddress = new String[pairedDevices.size()];
+				for (int i = 0; i < pairedDevices.size(); i++) {
+					macAddress[i] = pairedDevices.get(i).getName() + "(" + pairedDevices.get(i).getAddress() + "),";
+					devices += macAddress[i];
+				}
+			}				
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+pairedDevices.size(),"onRequestQposConnected");
+		}
 		
 	}
 
