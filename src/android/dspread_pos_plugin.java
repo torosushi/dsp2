@@ -308,10 +308,12 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			Set<BluetoothDevice> pairedDevices=mAdapter.getBondedDevices();
 			if (pairedDevices.size() > 0) {
 				String[] macAddress = new String[pairedDevices.size()];
-				for (int i = 0; i < pairedDevices.size(); i++) {
-					macAddress[i] = pairedDevices.get(i).getName() + "(" + pairedDevices.get(i).getAddress() + "),";
+				int i = 0;
+				for(BluetoothDevice device: pairedDevices){
+					macAddress[i]=pairedDevices.getName() + "(" + pairedDevices.getAddress() + "),";
 					devices += macAddress[i];
-				}
+				i++}
+				callback(devices);
 			}				
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+pairedDevices.size(),"onRequestQposConnected");
 		}
