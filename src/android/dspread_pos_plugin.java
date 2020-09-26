@@ -120,7 +120,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getDeviceList size "+listDevice.size(),"onRequestQposConnected");
 			//Toast.makeText(cordova.getActivity(),"getDeviceList "+listDevice.size(),Toast.LENGTH_LONG).show();
 			if(listDevice.size()<1){
-				Set<BluetoothDevice> listDevice=mAdapter.getBondedDevices();
+				listDevice=mAdapter.getBondedDevices();
 				callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+listDevice.size(),"onRequestQposConnected");
 			}
 			if(listDevice.size() > 0) {
