@@ -50,7 +50,7 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 /**
  * This class echoes a string called from JavaScript.
  */
@@ -224,6 +224,22 @@ public class dspread_pos_plugin extends CordovaPlugin {
 //		TRACE.i("sdkVersion:"+sdkVersion);
 		mAdapter=BluetoothAdapter.getDefaultAdapter();
 		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" CommunicationMode"+mAdapter.toString(),"onRequestQposConnected");
+        if(mAdapter.isEnabled()){
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" isEnabled","onRequestQposConnected");
+			String devices = "";
+			//deviceItemList=new ArrayList<DeviceItem>(); 
+			Set<BluetoothDevice> pairedDevices=mAdapter.getBondedDevices();
+			if (pairedDevices.size() > 0) {
+				String[] macAddress = new String[pairedDevices.size()];
+				int i = 0;
+				for(BluetoothDevice device: pairedDevices){
+					macAddress[i]=device.getName() + "(" + device.getAddress() + "),";
+					devices += macAddress[i];
+				i++;}
+				callback(devices);
+			}				
+			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+pairedDevices.size(),"onRequestQposConnected");
+		}
 //		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
 		//if(pairedDevice!=null){//this used for printer
 		//	printerAddress=pairedDevice.get("deviceAddress");//get the S85 printer address and name
