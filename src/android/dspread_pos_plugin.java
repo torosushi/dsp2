@@ -58,7 +58,7 @@ import java.util.Map;
 public class dspread_pos_plugin extends CordovaPlugin {
 	private MyPosListener listener;
 	private QPOSService pos;
-	private BluetoothAdapter mAdapter=BluetoothAdapter.getDefaultAdapter();
+	private BluetoothAdapter mAdapter;
 	private String sdkVersion;
 	private String blueToothAddress;
 	private List<BluetoothDevice> listDevice;
@@ -85,9 +85,9 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 	@Override
 	public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
+		if(action.equals("scanQPos2Mode")) {
 			open(CommunicationMode.BLUETOOTH);//initial the open mode
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" CommunicationMode","onRequestQposConnected");
-		if(action.equals("scanQPos2Mode")) {
 			boolean a=pos.scanQPos2Mode(activity, 10);
 			Toast.makeText(cordova.getActivity(), "!! scan success "+a, Toast.LENGTH_LONG).show();
 			if(a){callbackContext.success("begin to scan!");}
@@ -249,8 +249,8 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		pos.initListener(handler, listener);//audiojack reader?
 		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode listener "+listener,"onRequestQposConnected");
 		
-		sdkVersion = pos.getSdkVersion();
-		callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode sdkVersion "+sdkVersion,"onRequestQposConnected");
+		//sdkVersion = pos.getSdkVersion();
+		//callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode sdkVersion "+sdkVersion,"onRequestQposConnected");
 		//mAdapter=BluetoothAdapter.getDefaultAdapter();
 		//callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" open(CommunicationMode mAdapter "+mAdapter,"onRequestQposConnected");
 //		pairedDevice=BluetoothPort.getPairedDevice(mAdapter);
@@ -264,7 +264,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 	private void requestPer(){
 		//BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		//mAdapter=BluetoothAdapter.getDefaultAdapter();
+		mAdapter=BluetoothAdapter.getDefaultAdapter();
 		if (mAdapter != null && !mAdapter.isEnabled()) {//表示蓝牙不可用
 			Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			activity.startActivity(enabler);
