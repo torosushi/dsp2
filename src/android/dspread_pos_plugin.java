@@ -238,7 +238,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				i++;}
 				//callback(devices);
                 devices +=']';
-                callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" addrow "+devices,"addrow");
+                callbackJs(devices,"addrow");
 			}				
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+pairedDevices.size(),"onRequestQposConnected");
             callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices "+devices,"onRequestQposConnected");
