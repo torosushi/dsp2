@@ -234,7 +234,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				for(BluetoothDevice device: pairedDevices){
 					//macAddress[i]=device.getName() + "(" + device.getAddress() + "),";
                     if(i==0){devices +='[';}else if(i!=0){devices +=',';}
-					devices +='{'+device.getName()+':'+device.getAddress()+'}';
+					devices +='{'+device.getName()+':['+device.getAddress()+']}';
 				i++;}
 				//callback(devices);
                 devices +=']';
