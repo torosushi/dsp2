@@ -229,15 +229,15 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			//deviceItemList=new ArrayList<DeviceItem>(); 
 			Set<BluetoothDevice> pairedDevices=mAdapter.getBondedDevices();
 			if (pairedDevices.size() > 0) {
-				String[] macAddress = new String[pairedDevices.size()];
+				//String[] macAddress = new String[pairedDevices.size()];
 				int i = 0;
 				for(BluetoothDevice device: pairedDevices){
 					//macAddress[i]=device.getName() + "(" + device.getAddress() + "),";
-                    if(i==0){devices +='[';}else if(i!=0){devices +=',';}
-					devices +='{'+device.getName()+':['+device.getAddress()+']}';
+                    if(i!=0){devices +=",";}
+					devices +="{"+device.getName()+":["+device.getAddress()+"]}";
 				i++;}
 				//callback(devices);
-                devices +=']';
+                devices ="["+devices+"]";
                 callbackJs(devices,"addrow");
 			}				
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+pairedDevices.size(),"onRequestQposConnected");
