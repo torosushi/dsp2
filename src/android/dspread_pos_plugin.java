@@ -106,6 +106,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			TRACE.w("getDeviceList===");
 			posFlag=true;
 			listDevice=pos.getDeviceList();//can get all scaned device
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" listDevice "+listDevice.toString(),"onRequestQposConnected");
         /*	for (BluetoothDevice dev : listDevice) {
         		Map<String, Object> itm = new HashMap<String, Object>();
         		itm.put("TITLE", dev.getName() + "(" + dev.getAddress() + ")");
@@ -131,11 +132,11 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		}else if(action.equals("disconnectBT")){//discooect bluetooth
 			pos.disconnectBT();
 		}else if(action.equals("getQposInfo")){//get the pos info
-			String o_getQposInfo=pos.getQposInfo().toString();
-            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getQposInfo "+o_getQposInfo,"onRequestQposConnected");
+			pos.getQposInfo();
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getQposInfo ","onRequestQposConnected");
 		}else if(action.equals("getQposId")){//get the pos id
-			String o_getQposId=pos.getQposId(20).toString();
-            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getQposId "+o_getQposId,"onRequestQposConnected");
+			pos.getQposId(20);
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getQposId ","onRequestQposConnected");
 		}else if(action.equals("updateIPEK")){//update the ipek key
 			String ipekGroup=args.getString(0);
 			String trackksn=args.getString(1);
@@ -487,6 +488,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 		@Override
 		public void onDoTradeResult(DoTradeResult arg0, Hashtable<String, String> arg1) {
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" onDoTradeResult ","onRequestQposConnected");
 			if (arg0 == DoTradeResult.NONE) {
 				TRACE.d("no_card_detected");
 			} else if (arg0 == DoTradeResult.ICC) {
@@ -712,6 +714,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		@Override
 		public void onError(Error arg0) {
 			TRACE.d("onError");
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" onError ","onRequestQposConnected");
 			if (arg0 == Error.CMD_NOT_AVAILABLE) {
 				TRACE.d("command_not_available");
 			} else if (arg0 == Error.TIMEOUT) {
@@ -889,21 +892,21 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 		@Override
 		public void onQposIdResult(Hashtable<String, String> arg0) {
+            String content="";
 			if(arg0!=null){
 				String posId = arg0.get("posId") == null ? "" : arg0
 						.get("posId");
 				String csn = arg0.get("csn") == null ? "" : arg0
 						.get("csn");
 				String psamId=arg0.get("psamId") == null ? "" : arg0
-						.get("psamId");
-
-				String content = "";
+						.get("psamId");				
 				content += "posId" + posId + "\n";
 				content += "csn: " + csn + "\n";
 				content += "conn: " + pos.getBluetoothState() + "\n";
 				content += "psamId: " + psamId + "\n";
 				callback(content);
 			}
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" onQposIdResult "+content,"onRequestQposConnected");
 		}
 
 		@Override
@@ -937,6 +940,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			content += "isSupportedTrack2" + isSupportedTrack2 + "\n";
 			content += "isSupportedTrack3" + isSupportedTrack3 + "\n";
 			callback(content);
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" onQposInfoResult "+content,"onRequestQposConnected");
 		}
 
 		//@Override
