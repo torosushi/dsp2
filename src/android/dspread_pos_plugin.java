@@ -79,7 +79,6 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-
 		return super.execute(action, args, callbackContext);
 	}
 
@@ -233,10 +232,13 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				String[] macAddress = new String[pairedDevices.size()];
 				int i = 0;
 				for(BluetoothDevice device: pairedDevices){
-					macAddress[i]=device.getName() + "(" + device.getAddress() + "),";
-					devices += macAddress[i];
+					//macAddress[i]=device.getName() + "(" + device.getAddress() + "),";
+                    if(i==0){devices +='['}else if(i!=0){devices +=','}
+					devices +='{'+device.getName()+':'+device.getAddress()+'}';
 				i++;}
-				callback(devices);
+				//callback(devices);
+                devices +=']';
+                callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" addrow "+devices,"addrow");
 			}				
 			callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices size "+pairedDevices.size(),"onRequestQposConnected");
             callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getBondedDevices "+devices,"onRequestQposConnected");
@@ -255,6 +257,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		if (adapter != null && !adapter.isEnabled()) {//表示蓝牙不可用
 			Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			activity.startActivity(enabler);
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" ACTION_REQUEST_ENABLE ","onRequestQposConnected");
 		}
 		lm = (LocationManager) activity.getSystemService(activity.LOCATION_SERVICE);
 		boolean ok = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -264,9 +267,11 @@ public class dspread_pos_plugin extends CordovaPlugin {
 				// 没有权限，申请权限。
 				// 申请授权。
 				cordova.requestPermission(this,100,Manifest.permission.ACCESS_COARSE_LOCATION);
+                callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" ACCESS_COARSE_LOCATION ","onRequestQposConnected");
 			} else {
 				// 有权限了，去放肆吧。
 				Toast.makeText(activity, "Has permission!", Toast.LENGTH_SHORT).show();
+                callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" Has permission! ","onRequestQposConnected");
 			}
 		} else {
 			Log.e("BRG", "系统检测到未开启GPS定位服务");
@@ -274,6 +279,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			Intent intent = new Intent();
 			intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 			activity.startActivity(intent);
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" ACTION_LOCATION_SOURCE_SETTINGS","onRequestQposConnected");
 		}
 		//if (Build.VERSION.SDK_INT >= 23) {
 		//    if(!cordova.hasPermission("android.permission.ACCESS_FINE_LOCATION")){
@@ -295,11 +301,12 @@ public class dspread_pos_plugin extends CordovaPlugin {
 						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					// 权限被用户同意。
 					Toast.makeText(activity, "Has open the permission!", Toast.LENGTH_LONG).show();
+                    callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" PERMISSION_GRANTED","onRequestQposConnected");
 				} else {
 					// 权限被用户拒绝了。
 					Toast.makeText(activity, "Permission has been limited", Toast.LENGTH_LONG).show();
+                    callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" PERMISSION limited","onRequestQposConnected");
 				}
-
 			}
 			break;
 		}
