@@ -97,9 +97,11 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			//String mac=address.substring(i+1,e);
 			TRACE.d("address==="+address);
 			pos.connectBluetoothDevice(isAutoConnect, 20, address);
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" isAutoConnect "+address,"onRequestQposConnected");
 		}else if(action.equals("doTrade")){//start to do a trade
 			int timeout=args.getInt(0);
 			pos.doTrade(timeout);
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" doTrade "+timeout,"onRequestQposConnected");
 		}else if(action.equals("getDeviceList")){//get all scaned devices
 			TRACE.w("getDeviceList===");
 			posFlag=true;
@@ -130,8 +132,10 @@ public class dspread_pos_plugin extends CordovaPlugin {
 			pos.disconnectBT();
 		}else if(action.equals("getQposInfo")){//get the pos info
 			pos.getQposInfo();
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getQposInfo "+timeout,"onRequestQposConnected");
 		}else if(action.equals("getQposId")){//get the pos id
 			pos.getQposId(20);
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getQposId "+timeout,"onRequestQposConnected");
 		}else if(action.equals("updateIPEK")){//update the ipek key
 			String ipekGroup=args.getString(0);
 			String trackksn=args.getString(1);
