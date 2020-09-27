@@ -131,11 +131,11 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		}else if(action.equals("disconnectBT")){//discooect bluetooth
 			pos.disconnectBT();
 		}else if(action.equals("getQposInfo")){//get the pos info
-			//pos.getQposInfo();
-            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getQposInfo "+pos.getQposInfo(),"onRequestQposConnected");
+			String o_getQposInfo=pos.getQposInfo();
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getQposInfo "+o_getQposInfo,"onRequestQposConnected");
 		}else if(action.equals("getQposId")){//get the pos id
-			//pos.getQposId(20);
-            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getQposId "+pos.getQposId(20),"onRequestQposConnected");
+			String o_getQposId=pos.getQposId(20);
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" getQposId "+o_getQposId,"onRequestQposConnected");
 		}else if(action.equals("updateIPEK")){//update the ipek key
 			String ipekGroup=args.getString(0);
 			String trackksn=args.getString(1);
