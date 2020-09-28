@@ -101,7 +101,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		}else if(action.equals("doTrade")){//start to do a trade
 			int timeout=args.getInt(0);
 			pos.doTrade(timeout);
-            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" doTrade "+timeout,"onRequestQposConnected");
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" doTrade timeout "+timeout,"onRequestQposConnected");
 		}else if(action.equals("getDeviceList")){//get all scaned devices
 			TRACE.w("getDeviceList===");
 			posFlag=true;
