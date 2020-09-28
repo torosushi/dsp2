@@ -473,6 +473,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 
 		@Override
 		public void onDeviceFound(BluetoothDevice arg0) {
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" onDeviceFound "+arg0.toString(),"onRequestQposConnected");
 			if(arg0!=null){
 				String address=arg0.getAddress();
 				String name=arg0.getName();
@@ -881,7 +882,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		@Override
 		public void onQposDoTradeLog(boolean arg0) {
 			// TODO Auto-generated method stub
-
+            callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" onQposDoTradeLog "+arg0.toSting(),"onRequestQposConnected");
 		}
 
 		@Override
