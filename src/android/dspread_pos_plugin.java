@@ -882,7 +882,7 @@ public class dspread_pos_plugin extends CordovaPlugin {
 		@Override
 		public void onQposDoTradeLog(boolean arg0) {
 			// TODO Auto-generated method stub
-            if(arg0!=null){
+            if(arg0){
                 callbackJs(new Throwable().getStackTrace()[0].getLineNumber()+" onQposDoTradeLog ","onRequestQposConnected");
             }
 		}
